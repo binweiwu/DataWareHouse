@@ -1,0 +1,7 @@
+apt-get update
+apt-get install mysql-server
+
+apt-get install python-dev
+apt-get install libmysqlclient-dev
+
+pip install MySQL-python
