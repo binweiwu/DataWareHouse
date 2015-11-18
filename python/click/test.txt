@@ -1,0 +1,24 @@
+root@ubuntu:~/buaa/py# ./using_click.py 
+Action: Go
+Study Go!
+root@ubuntu:~/buaa/py# ./using_click.py --count=4
+Action: Go
+Study Go!
+Study Go!
+Study Go!
+Study Go!
+root@ubuntu:~/buaa/py# ./using_click.py --count=2 --name=Go
+Error: no such option: --name
+root@ubuntu:~/buaa/py# ./using_click.py --count=2 --action=Go
+Study Go!
+Study Go!
+root@ubuntu:~/buaa/py# ./using_click.py --help
+Usage: using_click.py [OPTIONS]
+
+  Simple program бнбн..
+
+Options:
+  --count INTEGER  Number of repear.
+  --action TEXT    action you enter.
+  --help           Show this message and exit.
+root@ubuntu:~/buaa/py#
