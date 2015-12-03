@@ -1,0 +1,1404 @@
+ #定义shell变量
+WORK_DIR := /home/ubuntu/data_sync
+
+#定义脚本依赖,作业不要放在这个上面!!!
+
+
+send_mail : www lms dlut_superclass lms_dlut dashboard dashboard_2u dw mobile rpt_course_view post_hot_courses_www user_click_log sos_users lti_course lti_course_chapter lcms
+	python $(WORK_DIR)/send_mail.py
+	@touch send_mail
+
+send_mail_day : handleSQL rpt_mobile_channel_day
+	@touch send_mail_day
+
+dw : dw_course_view dw_course_pv_migra dw_course_enroll_count dw_course_view_count dw_hot_course dw_user_view_process dw_piwik_visit_log dw_piwik_visit dw_user_action_count dw_lcms_avg_score_table dw_lcms_score_top dw_lcms_courses_table dw_students dw_paid_user_analys dw_paid_orders_items dw_courses
+	@touch dw
+
+mobile : mobile_baidu_coupon mobile_baidu_activity mobile_channel mobile_cpa
+	@touch mobile
+
+lms : lms_content lms_users lms_discussion_topics lms_assignments lms_discussion_entries lms_quizzes lms_quiz_submissions lms_quiz_questions lms_quiz_groups lms_attachments
+	@touch lms
+
+dlut_superclass : dlut_course_chapter dlut_tbl_courses dlut_tbl_log dlut_tbl_lti dlut_tbl_lti_user
+	@touch dlut_superclass
+
+rpt_mobile_channel_day : mobile_cpa
+	@touch rpt_mobile_channel_day_start
+	python $(WORK_DIR)/rpt_mobile_channel_day.py
+	@touch rpt_mobile_channel_day
+
+rpt_mobile_user_action_week : mobile_cpa dw_user_action_count handled_video_action
+	@touch rpt_mobile_user_action_week_start
+	python $(WORK_DIR)/rpt_mobile_user_action_week.py $(day)
+	@touch rpt_mobile_user_action_week
+
+dw_user_courses : lms_enrollments lms_submissions
+	@touch dw_user_courses_start
+	python $(WORK_DIR)/dw_user_courses.py
+	@touch dw_user_courses
+
+dw_user_action_count : dw_user_courses
+	@touch dw_user_action_count_start
+	python $(WORK_DIR)/dw_user_action_count.py
+	@touch dw_user_action_count
+
+dw_chapter_info : tbl_lti lms_content_tags lms_context_modules
+	@touch dw_chapter_info_start
+	python $(WORK_DIR)/dw_chapter_info.py
+	@touch dw_chapter_info
+
+get_users_table : register_info lms_pseudonyms
+
+register_info : www_users
+	@touch register_info_start
+	python $(WORK_DIR)/register_info.py
+
+video_action :
+	@touch video_action_start
+	python $(WORK_DIR)/sync_table_lti_video_action.py
+	@touch video_action
+
+handled_video_action : video_action
+	@touch handled_video_action_start
+	python $(WORK_DIR)/handled_video_action.py
+	@touch handled_video_action
+
+tbl_lti :
+	@touch tbl_lti_start
+	python $(WORK_DIR)/sync_table_tbl_lti.py
+	@touch tbl_lti
+
+# lms
+lms_users :
+	@touch lms_users_start
+	python $(WORK_DIR)/sync_table_lms.py users
+	@touch lms_users
+
+lms_enrollments :
+	@touch lms_enrollments_start
+	python $(WORK_DIR)/sync_table_lms.py enrollments
+	@touch lms_enrollments
+
+lms_courses :
+	@touch lms_courses_start
+	python $(WORK_DIR)/sync_table_lms.py courses
+	@touch lms_courses
+
+lms_submissions :
+	@touch lms_submissions_start
+	python $(WORK_DIR)/sync_table_lms.py submissions
+	@touch lms_submissions
+
+lms_discussion_topics :
+	@touch lms_discussion_topics_start
+	python $(WORK_DIR)/sync_table_lms.py discussion_topics
+	@touch lms_discussion_topics
+
+lms_assignments :
+	@touch lms_assignments_start
+	python $(WORK_DIR)/sync_table_lms.py assignments
+	@touch lms_assignments
+
+lms_attachments :
+	@touch lms_attachments_start
+	python $(WORK_DIR)/sync_table_lms_attachments.py attachments
+	@touch lms_attachments
+
+lms_discussion_entries :
+	@touch lms_discussion_entries_start
+	python $(WORK_DIR)/sync_table_lms.py discussion_entries
+	@touch lms_discussion_entries
+
+#context
+lms_content : lms_content_exports lms_content_migrations lms_content_participation_counts lms_content_tags lms_context_external_tools lms_context_message_participants lms_context_module_progressions lms_context_modules
+	@touch lms_content
+
+lms_content_exports :
+	@touch lms_content_exports_start
+	python $(WORK_DIR)/sync_table_lms.py content_exports
+	@touch lms_content_exports
+
+lms_content_migrations :
+	@touch lms_content_migrations_start
+	python $(WORK_DIR)/sync_table_lms.py content_migrations
+	@touch lms_content_migrations
+
+lms_content_participation_counts :
+	@touch lms_content_participation_counts_start
+	python $(WORK_DIR)/sync_table_lms.py content_participation_counts
+	@touch lms_content_participation_counts
+
+lms_content_tags :
+	@touch lms_content_tags_start
+	python $(WORK_DIR)/sync_table_lms.py content_tags
+	@touch lms_content_tags
+
+lms_context_external_tools :
+	@touch lms_context_external_tools_start
+	python $(WORK_DIR)/sync_table_lms.py context_external_tools
+	@touch lms_context_external_tools
+
+lms_context_message_participants :
+	@touch lms_context_message_participants_start
+	python $(WORK_DIR)/sync_table_lms.py context_message_participants
+	@touch lms_context_message_participants
+
+lms_context_module_progressions :
+	@touch lms_context_module_progressions_start
+	python $(WORK_DIR)/sync_table_lms.py context_module_progressions
+	@touch lms_context_module_progressions
+
+lms_context_modules :
+	@touch lms_context_modules_start
+	python $(WORK_DIR)/sync_table_lms.py context_modules
+	@touch lms_context_modules
+
+lms_quizzes :
+	@touch lms_quizzes_start
+	python $(WORK_DIR)/sync_table_lms.py quizzes
+	@touch lms_quizzes
+
+lms_quiz_submissions :
+	@touch lms_quiz_submissions_start
+	python $(WORK_DIR)/sync_table_lms.py quiz_submissions
+	@touch lms_quiz_submissions
+
+lms_quiz_questions :
+	@touch lms_quiz_questions_start
+	python $(WORK_DIR)/sync_table_lms.py quiz_questions
+	@touch lms_quiz_questions
+
+lms_quiz_groups :
+	@touch lms_quiz_groups_start
+	python $(WORK_DIR)/sync_table_lms.py quiz_groups
+	@touch lms_quiz_groups
+
+#大连理工
+lms_dlut : lms_dlut_content lms_dlut_users lms_dlut_discussion_topics lms_dlut_assignments lms_dlut_pseudonyms lms_dlut_discussion_entries lms_dlut_quizzes lms_dlut_quiz_submissions lms_dlut_quiz_questions lms_dlut_quiz_groups lms_dlut_enrollments lms_dlut_courses lms_dlut_submissions
+	@touch lms_dlut
+
+lms_dlut_users :
+	@touch lms_dlut_users_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py users
+	@touch lms_dlut_users
+
+
+lms_dlut_pseudonyms :
+	@touch lms_dlut_pseudonyms_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py pseudonyms
+	@touch lms_dlut_pseudonyms
+
+lms_dlut_enrollments :
+	@touch lms_dlut_enrollments_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py enrollments
+	@touch lms_dlut_enrollments
+
+lms_dlut_courses :
+	@touch lms_dlut_courses_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py courses
+	@touch lms_dlut_courses
+
+lms_dlut_submissions :
+	@touch lms_dlut_submissions_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py submissions
+	@touch lms_dlut_submissions
+
+lms_dlut_discussion_topics :
+	@touch lms_dlut_discussion_topics_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py discussion_topics
+	@touch lms_dlut_discussion_topics
+
+lms_dlut_assignments :
+	@touch lms_dlut_assignments_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py assignments
+	@touch lms_dlut_assignments
+
+lms_dlut_discussion_entries :
+	@touch lms_dlut_discussion_entries_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py discussion_entries
+	@touch lms_dlut_discussion_entries
+
+lms_dlut_content : lms_dlut_content_exports lms_dlut_content_migrations lms_dlut_content_participation_counts lms_dlut_content_tags lms_dlut_context_external_tools lms_dlut_context_message_participants lms_dlut_context_module_progressions lms_dlut_context_modules
+	@touch lms_dlut_content
+
+lms_dlut_content_exports :
+	@touch lms_dlut_content_exports_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py content_exports
+	@touch lms_dlut_content_exports
+
+lms_dlut_content_migrations :
+	@touch lms_dlut_content_migrations_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py content_migrations
+	@touch lms_dlut_content_migrations
+
+lms_dlut_content_participation_counts :
+	@touch lms_dlut_content_participation_counts_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py content_participation_counts
+	@touch lms_dlut_content_participation_counts
+
+lms_dlut_content_tags :
+	@touch lms_dlut_content_tags_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py content_tags
+	@touch lms_dlut_content_tags
+
+lms_dlut_context_external_tools :
+	@touch lms_dlut_context_external_tools_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py context_external_tools
+	@touch lms_dlut_context_external_tools
+
+lms_dlut_context_message_participants :
+	@touch lms_dlut_context_message_participants_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py context_message_participants
+	@touch lms_dlut_context_message_participants
+
+lms_dlut_context_module_progressions :
+	@touch lms_dlut_context_module_progressions_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py context_module_progressions
+	@touch lms_dlut_context_module_progressions
+
+lms_dlut_context_modules :
+	@touch lms_dlut_context_modules_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py context_modules
+	@touch lms_dlut_context_modules
+
+lms_dlut_quizzes :
+	@touch lms_dlut_quizzes_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py quizzes
+	@touch lms_dlut_quizzes
+
+lms_dlut_quiz_submissions :
+	@touch lms_dlut_quiz_submissions_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py quiz_submissions
+	@touch lms_dlut_quiz_submissions
+
+lms_dlut_quiz_questions :
+	@touch lms_dlut_quiz_questions_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py quiz_questions
+	@touch lms_dlut_quiz_questions
+
+lms_dlut_quiz_groups :
+	@touch lms_dlut_quiz_groups_start
+	python $(WORK_DIR)/sync_table_lms_dlut.py quiz_groups
+	@touch lms_dlut_quiz_groups
+
+rpt_course_view : handled_video_action tbl_lti lms_courses
+	@touch rpt_course_view_start
+	python $(WORK_DIR)/rpt_course_view_migra.py
+	@touch rpt_course_view
+
+handleSQL :
+	@touch handleSQL_start
+	python $(WORK_DIR)/handleSQL.py
+	@touch handleSQL
+
+dw_course_view : handled_video_action
+	@touch dw_course_view_start
+	python $(WORK_DIR)/dw_course_view_migra.py
+	@touch dw_course_view
+
+dw_course_pv_migra :
+	@touch dw_course_pv_migra_start
+	python $(WORK_DIR)/dw_course_pv_migra.py $(day)
+	@touch dw_course_pv_migra
+
+dw_course_enroll_count : lms_enrollments video_action tbl_lti
+	@touch dw_course_enroll_count_start
+	python $(WORK_DIR)/dw_course_enroll_count.py
+	@touch dw_course_enroll_count
+
+dw_course_view_count : video_action tbl_lti www_courses
+	@touch dw_course_view_count_start
+	python $(WORK_DIR)/dw_course_view_count.py
+	@touch dw_course_view_count
+
+dw_hot_course : dw_course_view_count dw_course_enroll_count dw_course_pv_migra
+	@touch dw_hot_course_start
+	python $(WORK_DIR)/hot_recom_stupid.py > /dev/null 2>&1
+	@touch dw_hot_course
+
+www_courses :
+	@touch www_courses_start
+	python $(WORK_DIR)/sync_table_www.py courses
+	@touch www_courses
+
+www_course_infos :
+	@touch www_course_infos_start
+	python $(WORK_DIR)/sync_table_www.py course_infos
+	@touch www_course_infos
+
+www_courses_courses :
+	@touch www_courses_courses_start
+	python $(WORK_DIR)/sync_table_www.py courses_courses
+	@touch www_courses_courses
+
+www_courses_instructors :
+	@touch www_courses_instructors_start
+	python $(WORK_DIR)/sync_table_www.py courses_instructors
+	@touch www_courses_instructors
+
+www_courses_lms_courses :
+	@touch www_courses_lms_courses_start
+	python $(WORK_DIR)/www_courses_lms_courses.py courses_lms_courses
+	@touch www_courses_lms_courses
+
+www_courses_micro_specialties :
+	@touch www_courses_micro_specialties_start
+	python $(WORK_DIR)/sync_table_www.py courses_micro_specialties
+	@touch www_courses_micro_specialties
+
+www_courses_navigations :
+	@touch www_courses_navigations_start
+	python $(WORK_DIR)/sync_table_www.py courses_navigations
+	@touch www_courses_navigations
+
+www_enrollments :
+	@touch www_enrollments_start
+	python $(WORK_DIR)/sync_table_www.py enrollments
+	@touch www_enrollments
+
+www_enrollment_terms :
+	@touch www_enrollment_terms_start
+	python $(WORK_DIR)/sync_table_www.py enrollment_terms
+	@touch www_enrollment_terms
+
+www_evaluations :
+	@touch www_evaluations_start
+	python $(WORK_DIR)/sync_table_www.py evaluations
+	@touch www_evaluations
+
+www_evaluations_users :
+	@touch www_evaluations_users_start
+	python $(WORK_DIR)/sync_table_www.py evaluations_users
+	@touch www_evaluations_users
+
+www_instructors :
+	@touch www_instructors_start
+	python $(WORK_DIR)/sync_table_www.py instructors
+	@touch www_instructors
+
+www_learning_records :
+	@touch www_learning_records_start
+	python $(WORK_DIR)/sync_table_www.py learning_records
+	@touch www_learning_records
+
+www_micro_specialties :
+	@touch www_micro_specialties_start
+	python $(WORK_DIR)/sync_table_www.py micro_specialties
+	@touch www_micro_specialties
+
+www_micro_specialties_users :
+	@touch www_micro_specialties_users_start
+	python $(WORK_DIR)/sync_table_www.py micro_specialties_users
+	@touch www_micro_specialties_users
+
+www_navigations :
+	@touch www_navigations_start
+	python $(WORK_DIR)/sync_table_www.py navigations
+	@touch www_navigations
+
+www_users :
+	@touch www_users_start
+	date >> ~/www_user.log
+	python $(WORK_DIR)/sync_table_www.py users >> ~/www_user.log 2>&1
+
+www_areas :
+	@touch www_areas_start
+	python $(WORK_DIR)/www_areas_migra.py areas
+	@touch www_areas
+
+www_assets :
+	@touch www_assets_start
+	python $(WORK_DIR)/sync_table_www.py assets
+	@touch www_assets
+
+www_categories :
+	@touch www_categories_start
+	python $(WORK_DIR)/sync_table_www.py categories
+	@touch www_categories
+
+www_certificates :
+	@touch www_certificates_start
+	python $(WORK_DIR)/sync_table_www.py certificates
+	@touch www_certificates
+
+www_certificates_users :
+	@touch www_certificates_users_start
+	python $(WORK_DIR)/sync_table_www.py certificates_users
+	@touch www_certificates_users
+
+www_collections :
+	@touch www_collections_start
+	python $(WORK_DIR)/sync_table_www.py collections
+	@touch www_collections
+
+www_common_logs :
+	@touch www_common_logs_start
+	python $(WORK_DIR)/sync_table_www.py common_logs
+	@touch www_common_logs
+
+www_discussions :
+	@touch www_discussions_start
+	python $(WORK_DIR)/sync_table_www.py discussions
+	@touch www_discussions
+
+www_faqs :
+	@touch www_faqs_start
+	python $(WORK_DIR)/sync_table_www.py faqs
+	@touch www_faqs
+
+www_feedbacks :
+	@touch www_feedbacks_start
+	python $(WORK_DIR)/sync_table_www.py feedbacks
+	@touch www_feedbacks
+
+www_institutions :
+	@touch www_institutions_start
+	python $(WORK_DIR)/sync_table_www.py institutions
+	@touch www_institutions
+
+www_news :
+	@touch www_news_start
+	python $(WORK_DIR)/sync_table_www.py news
+	@touch www_news
+
+www_pages :
+	@touch www_pages_start
+	python $(WORK_DIR)/sync_table_www.py pages
+	@touch www_pages
+
+www_profiles :
+	@touch www_profiles_start
+	python $(WORK_DIR)/sync_table_www.py profiles
+	@touch www_profiles
+
+www_related_courses_courses :
+	@touch www_related_courses_courses_start
+	python $(WORK_DIR)/sync_table_www.py related_courses_courses
+	@touch www_related_courses_courses
+
+www_roles :
+	@touch www_roles_start
+	python $(WORK_DIR)/sync_table_www.py roles
+	@touch www_roles
+
+www_simple_captcha_data :
+	@touch www_simple_captcha_data_start
+	python $(WORK_DIR)/sync_table_www.py simple_captcha_data
+	@touch www_simple_captcha_data
+
+www_specialties :
+	@touch www_specialties_start
+	python $(WORK_DIR)/sync_table_www.py specialties
+	@touch www_specialties
+
+www_syllabuses :
+	@touch www_syllabuses_start
+	python $(WORK_DIR)/sync_table_www.py syllabuses
+	@touch www_syllabuses
+
+www_taggings :
+	@touch www_taggings_start
+	python $(WORK_DIR)/www_tag_migra.py taggings
+	@touch www_taggings
+
+www_tags :
+	@touch www_tags_start
+	python $(WORK_DIR)/www_tag_migra.py tags
+	@touch www_tags
+
+www_versions :
+	@touch www_versions_start
+	python $(WORK_DIR)/www_versions_migra.py versions
+	@touch www_versions
+
+www_zones :
+	@touch www_zones_start
+	python $(WORK_DIR)/www_zones_migra.py zones
+	@touch www_zones
+
+dw_course_table : www_courses www_courses_lms_courses tbl_lti update_start_conclude_enrollments_courses_lms_courses
+	@touch dw_course_table_start
+	python $(WORK_DIR)/dw_course_table.py
+	@touch dw_course_table
+
+www_scores :
+	@touch www_scores_start
+	python $(WORK_DIR)/sync_table_www.py scores
+	@touch www_scores
+
+www_sign_in_stage_scores :
+	@touch www_sign_in_stage_scores_start
+	python $(WORK_DIR)/sync_table_www.py sign_in_stage_scores
+	@touch www_sign_in_stage_scores
+
+www_score_logs :
+	@touch www_score_logs_start
+	python $(WORK_DIR)/sync_table_www.py score_logs
+	@touch www_score_logs
+
+#
+post_hot_courses_www : dw_hot_course
+	@touch post_hot_courses_www_start
+	python $(WORK_DIR)/post_hot_courses_www.py
+	@touch post_hot_courses_www
+
+user_click_log :
+	@touch user_click_log_start
+	python $(WORK_DIR)/user_click_log.py
+	@touch user_click_log
+
+dw_user_view_process : handled_video_action dw_chapter_info lms_enrollments
+	@touch dw_user_view_process_start
+	python $(WORK_DIR)/dw_user_view_process.py
+	@touch dw_user_view_process
+
+lms_pseudonyms :
+	@touch lms_pseudonyms_start
+	python $(WORK_DIR)/sync_table_lms.py pseudonyms
+
+dw_users_info : www_profiles handled_video_action
+	@touch dw_users_info_start
+	python $(WORK_DIR)/dw_users_info.py
+	@touch dw_users_info
+
+dw_piwik_visit_log :
+	@touch dw_piwik_visit_log_start
+	python $(WORK_DIR)/dw_piwik_visit_log.py $(day)
+	@touch dw_piwik_visit_log
+
+dw_piwik_visit :
+	@touch dw_piwik_visit_start
+	python $(WORK_DIR)/dw_piwik_visit.py $(day)
+	@touch dw_piwik_visit
+
+dw_user_view_day : handled_video_action
+	@touch dw_user_view_day_start
+	python $(WORK_DIR)/dw_user_view_day.py $(day)
+	@touch dw_user_view_day
+
+dashboard : dashboard2_course_process dw_video_log dashboard2_course_summary_day dashboard2_summary_trend_day dashboard2_summary_top dashboard2_course_time_analyse_day res_score_report lcms_chapter_drag_update lcms_chapter_pause_update lcms_chapter_histogram_update lcms_chapter_back_update dashboard2_course_viewlist
+	@touch dashboard
+
+dashboard_2u : dashboard_2u_demo_school dashboard_time_trend_by_day dashboard_time_trend_by_hour dashboard_regional_distribution update_city_dashboard_regional_distribution dashboard_activity_by_week dashboard_register_info_day dashboard_course_info_count dashboard_activity_by_week_detail dashboard_course_histogram dashboard_userview_day dashboard_chapter_hot week_student_worker_course dashboard_course_viewlist_update dashboard_course_back_view_update
+	@touch dashboard_2u
+
+dashboard_2u_demo_school :  dashboard_2u_time_trend_by_day dashboard_2u_activity_by_hour dashboard_2u_summary_day dashboard_2u_time_trend_by_hour
+	@touch dashboard_2u_demo_school_start
+	python $(WORK_DIR)/dashboard_2u_demo_school.py $(day)
+	@touch dashboard_2u_demo_school
+
+dashboard_activity_by_week_detail : dw_user_view_day
+	@touch dashboard_activity_by_week_detail_start
+	python $(WORK_DIR)/dashboard_activity_by_week_detail.py $(day)
+	@touch dashboard_activity_by_week_detail
+
+dashboard_userview_day : dw_piwik_visit
+	@touch dashboard_userview_day_start
+	python $(WORK_DIR)/dashboard_userview_day.py $(day)
+	@touch dashboard_userview_day
+
+dashboard_course_info_count : dw_chapter_info dw_user_view_process dw_user_courses dw_course_table
+	@touch dashboard_course_info_count_start
+	python $(WORK_DIR)/dashboard_course_info_count.py
+	@touch dashboard_course_info_count
+
+dashboard_chapter_hot : dw_user_view_process
+	@touch dashboard_chapter_hot_start
+	python $(WORK_DIR)/dashboard_chapter_hot.py
+	@touch dashboard_chapter_hot
+
+dashboard_register_info_day : handled_video_action lms_enrollments
+	@touch dashboard_register_info_day_start
+	python $(WORK_DIR)/dashboard_register_info_day.py $(day)
+	@touch dashboard_register_info_day
+
+dashboard_time_trend_by_day : dw_piwik_visit_log handled_video_action lms_enrollments dw_users_info www_courses
+	@touch dashboard_time_trend_by_day_start
+	python $(WORK_DIR)/dashboard_time_trend_by_day.py $(day)
+	@touch dashboard_time_trend_by_day
+
+dashboard_time_trend_by_hour : dw_piwik_visit_log handled_video_action lms_enrollments dw_users_info www_courses
+	@touch dashboard_time_trend_by_hour_start
+	python $(WORK_DIR)/dashboard_time_trend_by_hour.py $(day)
+	@touch dashboard_time_trend_by_hour
+
+dashboard_regional_distribution : dw_piwik_visit_log handled_video_action dw_users_info
+	@touch dashboard_regional_distribution_start
+	python $(WORK_DIR)/dashboard_regional_distribution.py $(day)
+	@touch dashboard_regional_distribution
+
+dashboard_activity_by_week : dw_users_info handled_video_action
+	@touch dashboard_activity_by_week_start
+	python $(WORK_DIR)/dashboard_activity_by_week.py
+	@touch dashboard_activity_by_week
+
+dw_2u_course_table : dw_course_table www_courses_lms_courses_schools
+	@touch dw_2u_course_table_start
+	python $(WORK_DIR)/dw_2u_course_table.py
+	@touch dw_2u_course_table
+
+dashboard_2u_time_trend_by_day : www_schools dw_2u_users handled_video_action dw_2u_course_table lms_enrollments dw_users_info
+	@touch dashboard_2u_time_trend_by_day_start
+	python $(WORK_DIR)/dashboard_2u_time_trend_by_day.py $(day)
+	@touch dashboard_2u_time_trend_by_day
+
+dashboard_2u_time_trend_by_hour : www_schools dw_2u_users handled_video_action dw_2u_course_table lms_enrollments dw_users_info
+	@touch dashboard_2u_time_trend_by_hour_start
+	python $(WORK_DIR)/dashboard_2u_time_trend_by_hour.py $(day)
+	@touch dashboard_2u_time_trend_by_hour
+
+dashboard_2u_activity_by_hour : handled_video_action dw_2u_course_table dw_2u_users
+	@touch dashboard_2u_activity_by_hour_start
+	python $(WORK_DIR)/dashboard_2u_activity_by_hour.py $(day)
+	@touch dashboard_2u_activity_by_hour
+
+dashboard_2u_summary_day : www_schools dw_2u_users handled_video_action dw_2u_course_table lms_enrollments dw_users_info
+	@touch dashboard_2u_summary_day_start
+	python $(WORK_DIR)/dashboard_2u_summary_day.py $(day)
+	@touch dashboard_2u_summary_day
+
+update_city_dashboard_regional_distribution : dashboard_regional_distribution
+	@touch update_city_dashboard_regional_distribution_start
+	python $(WORK_DIR)/update_city_dashboard_regional_distribution.py > /dev/null
+	@touch update_city_dashboard_regional_distribution
+
+sos_users :
+	@touch sos_users_start
+	python $(WORK_DIR)/sync_table_sos.py users
+	@touch sos_users
+
+www_bugs :
+	@touch www_bugs_start
+	python $(WORK_DIR)/sync_table_www.py bugs
+	@touch www_bugs
+
+dw_sales_register_info_migra :
+	@touch dw_sales_register_info_migra_start
+	python $(WORK_DIR)/dw_sales_register_info_migra.py > /dev/null 2>&1
+	@touch dw_sales_register_info_migra
+
+lti_course :
+	@touch lti_course_start
+	python $(WORK_DIR)/sync_table_lti_course.py tbl_course lti_course
+	@touch lti_course
+
+lti_course_chapter :
+	@touch lti_course_chapter_start
+	python $(WORK_DIR)/sync_table_lti_course_chapter.py tbl_coursechapter lti_course_chapter
+	@touch lti_course_chapter
+
+rec_based_contents : www_categories www_courses dashboard_time_trend_by_day
+	@touch rec_based_contents_start
+	python $(WORK_DIR)/rec_based_contents.py > /dev/null 2>&1
+	@touch rec_based_contents
+
+wpt_rec_contents_email : dashboard_time_trend_by_day www_courses rec_based_contents
+	@touch wpt_rec_contents_email_start
+	python $(WORK_DIR)/wpt_rec_contents_email.py > /dev/null 2>&1
+	@touch wpt_rec_contents_email
+
+week_student_worker_course : www_profiles dw_course_table lms_enrollments handled_video_action
+	@touch week_student_worker_course_start
+	python $(WORK_DIR)/week_student_worker_course.py $(day) > /dev/null 2>&1
+	@touch week_student_worker_course
+
+www_students :
+	@touch www_students_start
+	python $(WORK_DIR)/sync_table_www.py students
+	@touch www_students
+
+www_students_users_confirmations :
+	@touch www_students_users_confirmations_start
+	python $(WORK_DIR)/sync_table_www.py students_users_confirmations www_students_users_confirmations
+	@touch www_students_users_confirmations
+
+www_schools :
+	@touch www_schools_start
+	python $(WORK_DIR)/sync_table_www.py schools
+	@touch www_schools
+
+www_orders :
+	@touch www_orders_start
+	python $(WORK_DIR)/sync_table_www.py orders
+	@touch www_orders
+
+www_line_items :
+	@touch www_line_items_start
+	python $(WORK_DIR)/sync_table_www.py line_items
+	@touch www_line_items
+
+dw_users_table : dw_users_info
+	@touch dw_users_table
+
+dashboard_course_user_action : lms_assignments lms_submissions handled_video_action dw_users_table dw_course_table
+	@touch dashboard_course_user_action_start
+	python $(WORK_DIR)/dashboard_course_user_action.py
+	@touch dashboard_course_user_action
+
+www_courses_lms_courses_schools :
+	@touch www_courses_lms_courses_schools_start
+	python $(WORK_DIR)/www_courses_lms_courses_schools.py courses_lms_courses_schools
+	@touch www_courses_lms_courses_schools
+
+dashboard_course_viewlist_update : handled_video_action
+	@touch dashboard_course_viewlist_update_start
+	python $(WORK_DIR)/dashboard_course_viewlist_update.py $(day)
+	@touch dashboard_course_viewlist_update
+
+dashboard_course_back_view_update : handled_video_action
+	@touch dashboard_course_back_view_update_start
+	python $(WORK_DIR)/dashboard_course_back_view_update.py
+	@touch dashboard_course_back_view_update
+
+dashboard_course_histogram : handled_video_action
+	@touch dashboard_course_histogram_start
+	python $(WORK_DIR)/dashboard_course_histogram_update.py
+	@touch dashboard_course_histogram
+
+mobile_channel :
+	@touch mobile_channel_start
+	python $(WORK_DIR)/sync_table_mobile_channel.py channel
+	@touch mobile_channel
+
+mobile_cpa :
+	@touch mobile_cpa_start
+	python $(WORK_DIR)/sync_table_mobile_cpa.py cpa
+	@touch mobile_cpa
+
+mobile_baidu_activity :
+	@touch mobile_baidu_activity_start
+	python $(WORK_DIR)/sync_table_api.py baidu_activity mobile_baidu_activity
+	@touch mobile_baidu_activity
+
+mobile_baidu_coupon :
+	@touch mobile_baidu_coupon_start
+	python $(WORK_DIR)/sync_table_api.py baidu_coupon mobile_baidu_coupon
+	@touch mobile_baidu_coupon
+
+api_video_logs :
+	@touch api_video_logs_start
+	python $(WORK_DIR)/sync_table_api.py video_logs api_video_logs
+	@touch api_video_logs	
+
+daily_update_tables : handled_video_action www_students dw_users_table www_schools lti_course_chapter lms_discussion_topics lms_assignments lms_quizzes lms_context_modules lms_content_tags lms_submissions dw_course_table dw_users_info dw_students
+	@touch daily_update_tables_start
+	python $(WORK_DIR)/daily_update_tables.py
+	@touch daily_update_tables
+
+dw_2u_users : daily_update_tables
+	@touch dw_2u_users
+
+dw_students : www_students dw_users_table
+	@touch dw_students_start
+	python $(WORK_DIR)/dw_students.py
+	@touch dw_students
+
+2U_sales_data : daily_update_tables
+	@touch 2U_sales_data_start
+	python $(WORK_DIR)/2U_sales_data.py > /dev/null 2>&1
+	@touch 2U_sales_data
+
+
+dw_paid_user_analys : www_orders www_line_items handled_video_action lms_enrollments dw_users_info
+	@touch dw_paid_user_analys_start
+	python $(WORK_DIR)/dw_paid_user_analys.py
+	@touch dw_paid_user_analys
+
+dw_paid_orders_items : www_orders www_line_items dw_users_table
+	@touch dw_paid_orders_items_start
+	python $(WORK_DIR)/dw_paid_orders_items.py $(day)
+	@touch dw_paid_orders_items
+
+dlut_course_chapter :
+	@touch dlut_course_chapter_start
+	python $(WORK_DIR)/sync_dlut_lti_course_chapter.py tbl_coursechapter dlut_course_chapter
+	@touch dlut_course_chapter
+
+dlut_tbl_courses :
+	@touch dlut_tbl_courses_start
+	python $(WORK_DIR)/sync_dlut_lti_course.py tbl_course dlut_tbl_courses
+	@touch dlut_tbl_courses
+
+dlut_tbl_log :
+	@touch dlut_tbl_log_start
+	python $(WORK_DIR)/sync_dlut_lti.py tbl_log dlut_tbl_log
+	@touch dlut_tbl_log
+
+dlut_tbl_lti :
+	@touch dlut_tbl_lti_start
+	python $(WORK_DIR)/sync_dlut_lti.py tbl_lti dlut_tbl_lti
+	@touch dlut_tbl_lti
+
+dlut_tbl_lti_user :
+	@touch dlut_tbl_lti_user_start
+	python $(WORK_DIR)/sync_dlut_lti.py tbl_ltiuser dlut_tbl_lti_user
+	@touch dlut_tbl_lti_user
+
+dlut_tbl_note :
+	@touch dlut_tbl_note_start
+	python $(WORK_DIR)/sync_dlut_lti_note.py tbl_note dlut_tbl_note
+	@touch dlut_tbl_note
+
+dw_courses : www dw_lcms_chapter_table lms_content_tags dw_course_table dw_lcms_chapter_table www_courses_lms_courses dw_lcms_courses_table daily_update_tables
+	@touch dw_courses_start
+	python $(WORK_DIR)/dw_courses.py
+	@touch dw_courses
+
+lcms : lcms_announcements lcms_assets lcms_assignments lcms_calendar_events lcms_categories lcms_chapters lcms_context_external_tools lcms_courses lcms_courses_instructors lcms_enrollments lcms_forums lcms_instructors lcms_instructors_videos lcms_knowledge_point_versions lcms_knowledge_points lcms_knowledge_points_units lcms_learning_progressions lcms_menus lcms_notifications lcms_pages lcms_permissions lcms_posts lcms_quiz_answers lcms_quiz_groups lcms_quiz_questions lcms_quiz_submissions lcms_quizzes lcms_report_logs lcms_roles lcms_submissions lcms_topics lcms_unit_progressions lcms_units lcms_users lcms_video_logs lcms_videos lcms_vote_logs lcms_oc_subscribe_logs
+	@touch lcms
+
+lcms_announcements :
+	@touch lcms_announcements_start
+	python $(WORK_DIR)/sync_table_lcms.py announcements
+	@touch lcms_announcements
+
+lcms_assets :
+	@touch lcms_assets_start
+	python $(WORK_DIR)/sync_table_lcms.py assets
+	@touch lcms_assets
+
+lcms_assignments :
+	@touch lcms_assignments_start
+	python $(WORK_DIR)/sync_table_lcms.py assignments
+	@touch lcms_assignments
+
+lcms_calendar_events :
+	@touch lcms_calendar_events_start
+	python $(WORK_DIR)/sync_table_lcms.py calendar_events
+	@touch lcms_calendar_events
+
+lcms_categories :
+	@touch lcms_categories_start
+	python $(WORK_DIR)/sync_table_lcms.py categories
+	@touch lcms_categories
+
+lcms_chapters :
+	@touch lcms_chapters_start
+	python $(WORK_DIR)/sync_table_lcms.py chapters
+	@touch lcms_chapters
+
+lcms_context_external_tools :
+	@touch lcms_context_external_tools_start
+	python $(WORK_DIR)/sync_table_lcms.py context_external_tools
+	@touch lcms_context_external_tools
+
+lcms_course_versions :
+	@touch lcms_course_versions_start
+	python $(WORK_DIR)/sync_table_lcms.py course_versions
+	@touch lcms_course_versions
+
+lcms_courses :
+	@touch lcms_courses_start
+	python $(WORK_DIR)/sync_table_lcms.py courses
+	@touch lcms_courses
+
+lcms_courses_instructors :
+	@touch lcms_courses_instructors_start
+	python $(WORK_DIR)/sync_table_lcms.py courses_instructors
+	@touch lcms_courses_instructors
+
+lcms_enrollments :
+	@touch lcms_enrollments_start
+	python $(WORK_DIR)/sync_table_lcms.py enrollments
+	@touch lcms_enrollments
+
+lcms_forums :
+	@touch lcms_forums_start
+	python $(WORK_DIR)/sync_table_lcms.py forums
+	@touch lcms_forums
+
+lcms_instructors :
+	@touch lcms_instructors_start
+	python $(WORK_DIR)/sync_table_lcms.py instructors
+	@touch lcms_instructors
+
+lcms_instructors_videos :
+	@touch lcms_instructors_videos_start
+	python $(WORK_DIR)/sync_table_lcms.py instructors_videos
+	@touch lcms_instructors_videos
+
+lcms_knowledge_point_versions :
+	@touch lcms_knowledge_point_versions_start
+	python $(WORK_DIR)/sync_table_lcms.py knowledge_point_versions
+	@touch lcms_knowledge_point_versions
+
+lcms_knowledge_points :
+	@touch lcms_knowledge_points_start
+	python $(WORK_DIR)/sync_table_lcms.py knowledge_points
+	@touch lcms_knowledge_points
+
+lcms_knowledge_points_units :
+	@touch lcms_knowledge_points_units_start
+	python $(WORK_DIR)/sync_table_lcms.py knowledge_points_units
+	@touch lcms_knowledge_points_units
+
+lcms_learning_progressions :
+	@touch lcms_learning_progressions_start
+	python $(WORK_DIR)/sync_table_lcms.py learning_progressions
+	@touch lcms_learning_progressions
+
+lcms_menus :
+	@touch lcms_menus_start
+	python $(WORK_DIR)/sync_table_lcms.py menus
+	@touch lcms_menus
+
+lcms_notifications :
+	@touch lcms_notifications_start
+	python $(WORK_DIR)/sync_table_lcms.py notifications
+	@touch lcms_notifications
+
+lcms_pages :
+	@touch lcms_pages_start
+	python $(WORK_DIR)/sync_table_lcms.py pages
+	@touch lcms_pages
+
+lcms_permissions :
+	@touch lcms_permissions_start
+	python $(WORK_DIR)/sync_table_lcms.py permissions
+	@touch lcms_permissions
+
+lcms_permissions_roles :
+	@touch lcms_permissions_roles_start
+	python $(WORK_DIR)/sync_table_lcms.py permissions_roles
+	@touch lcms_permissions_roles
+
+lcms_posts :
+	@touch lcms_posts_start
+	python $(WORK_DIR)/sync_table_lcms.py posts
+	@touch lcms_posts
+
+lcms_quiz_answers :
+	@touch lcms_quiz_answers_start
+	python $(WORK_DIR)/sync_table_lcms.py quiz_answers
+	@touch lcms_quiz_answers
+
+lcms_quiz_groups :
+	@touch lcms_quiz_groups_start
+	python $(WORK_DIR)/sync_table_lcms.py quiz_groups
+	@touch lcms_quiz_groups
+
+lcms_quiz_questions :
+	@touch lcms_quiz_questions_start
+	python $(WORK_DIR)/sync_table_lcms.py quiz_questions
+	@touch lcms_quiz_questions
+
+lcms_quiz_submissions :
+	@touch lcms_quiz_submissions_start
+	python $(WORK_DIR)/sync_table_lcms.py quiz_submissions
+	@touch lcms_quiz_submissions
+
+lcms_quizzes :
+	@touch lcms_quizzes_start
+	python $(WORK_DIR)/sync_table_lcms.py quizzes
+	@touch lcms_quizzes
+
+lcms_report_logs :
+	@touch lcms_report_logs_start
+	python $(WORK_DIR)/sync_table_lcms.py report_logs
+	@touch lcms_report_logs
+
+lcms_roles :
+	@touch lcms_roles_start
+	python $(WORK_DIR)/sync_table_lcms.py roles
+	@touch lcms_roles
+
+lcms_roles_users :
+	@touch lcms_roles_users_start
+	python $(WORK_DIR)/sync_table_lcms.py roles_users
+	@touch lcms_roles_users
+
+lcms_schema_migrations :
+	@touch lcms_schema_migrations_start
+	python $(WORK_DIR)/sync_table_lcms.py schema_migrations
+	@touch lcms_schema_migrations
+
+lcms_submissions :
+	@touch lcms_submissions_start
+	python $(WORK_DIR)/sync_table_lcms.py submissions
+	@touch lcms_submissions
+
+lcms_taggings :
+	@touch lcms_taggings_start
+	python $(WORK_DIR)/sync_table_lcms.py taggings
+	@touch lcms_taggings
+
+lcms_tags :
+	@touch lcms_tags_start
+	python $(WORK_DIR)/sync_table_lcms.py tags
+	@touch lcms_tags
+
+lcms_topics :
+	@touch lcms_topics_start
+	python $(WORK_DIR)/sync_table_lcms.py topics
+	@touch lcms_topics
+
+lcms_unit_progressions :
+	@touch lcms_unit_progressions_start
+	python $(WORK_DIR)/sync_table_lcms.py unit_progressions
+	@touch lcms_unit_progressions
+
+lcms_units :
+	@touch lcms_units_start
+	python $(WORK_DIR)/sync_table_lcms.py units
+	@touch lcms_units
+
+lcms_users :
+	@touch lcms_users_start
+	python $(WORK_DIR)/sync_table_lcms.py users
+	@touch lcms_users
+
+lcms_video_logs :
+	@touch lcms_video_logs_start
+	python $(WORK_DIR)/sync_table_lcms.py video_logs
+	@touch lcms_video_logs
+
+lcms_videos :
+	@touch lcms_videos_start
+	python $(WORK_DIR)/sync_table_lcms.py videos
+	python $(WORK_DIR)/update_video_length.py
+	@touch lcms_videos
+
+lcms_vote_logs :
+	@touch lcms_vote_logs_start
+	python $(WORK_DIR)/sync_table_lcms.py vote_logs
+	@touch lcms_vote_logs
+
+www_activities :
+	@touch www_activities_start
+	python $(WORK_DIR)/sync_table_www.py activities
+	@touch www_activities
+
+www_activities_users :
+	@touch www_activities_users_start
+	python $(WORK_DIR)/sync_table_www.py activities_users
+	@touch www_activities_users
+
+www_activity_orders :
+	@touch www_activity_orders_start
+	python $(WORK_DIR)/sync_table_www.py activity_orders
+	@touch www_activity_orders
+
+www_addresses :
+	@touch www_addresses_start
+	python $(WORK_DIR)/sync_table_www.py addresses
+	@touch www_addresses
+
+www_administrators :
+	@touch www_administrators_start
+	python $(WORK_DIR)/sync_table_www.py administrators
+	@touch www_administrators
+
+www_advertisements :
+	@touch www_advertisements_start
+	python $(WORK_DIR)/sync_table_www.py advertisements
+	@touch www_advertisements
+
+www_articles :
+	@touch www_articles_start
+	python $(WORK_DIR)/sync_table_www.py articles
+	@touch www_articles
+
+www_banners :
+	@touch www_banners_start
+	python $(WORK_DIR)/sync_table_www.py banners
+	@touch www_banners
+
+www_books :
+	@touch www_books_start
+	python $(WORK_DIR)/sync_table_www.py books
+	@touch www_books
+
+www_books_courses :
+	@touch www_books_courses_start
+	python $(WORK_DIR)/sync_table_www.py books_courses
+	@touch www_books_courses
+
+www_certificate_backgrounds :
+	@touch www_certificate_backgrounds_start
+	python $(WORK_DIR)/sync_table_www.py certificate_backgrounds
+	@touch www_certificate_backgrounds
+
+www_certificate_institutions :
+	@touch www_certificate_institutions_start
+	python $(WORK_DIR)/sync_table_www.py certificate_institutions
+	@touch www_certificate_institutions
+
+www_certificate_institutions_certificates :
+	@touch www_certificate_institutions_certificates_start
+	python $(WORK_DIR)/sync_table_www.py certificate_institutions_certificates
+	@touch www_certificate_institutions_certificates
+
+www_certificate_institutions_micro_certificates :
+	@touch www_certificate_institutions_micro_certificates_start
+	python $(WORK_DIR)/sync_table_www.py certificate_institutions_micro_certificates
+	@touch www_certificate_institutions_micro_certificates
+
+www_certificate_instructors :
+	@touch www_certificate_instructors_start
+	python $(WORK_DIR)/sync_table_www.py certificate_instructors
+	@touch www_certificate_instructors
+
+www_certificate_instructors_certificates :
+	@touch www_certificate_instructors_certificates_start
+	python $(WORK_DIR)/sync_table_www.py certificate_instructors_certificates
+	@touch www_certificate_instructors_certificates
+
+www_certificate_instructors_micro_certificates :
+	@touch www_certificate_instructors_micro_certificates_start
+	python $(WORK_DIR)/sync_table_www.py certificate_instructors_micro_certificates
+	@touch www_certificate_instructors_micro_certificates
+
+www_comments :
+	@touch www_comments_start
+	python $(WORK_DIR)/sync_table_www.py comments
+	@touch www_comments
+
+www_course_categories :
+	@touch www_course_categories_start
+	python $(WORK_DIR)/sync_table_www.py course_categories
+	@touch www_course_categories
+
+www_credit_students :
+	@touch www_credit_students_start
+	python $(WORK_DIR)/sync_table_www.py credit_students
+	@touch www_credit_students
+
+www_deliveries :
+	@touch www_deliveries_start
+	python $(WORK_DIR)/sync_table_www.py deliveries
+	@touch www_deliveries
+
+www_gifts :
+	@touch www_gifts_start
+	python $(WORK_DIR)/sync_table_www.py gifts
+	@touch www_gifts
+
+www_micro_certificates :
+	@touch www_micro_certificates_start
+	python $(WORK_DIR)/sync_table_www.py micro_certificates
+	@touch www_micro_certificates
+
+www_micro_certificates_users :
+	@touch www_micro_certificates_users_start
+	python $(WORK_DIR)/sync_table_www.py micro_certificates_users
+	@touch www_micro_certificates_users
+
+www_permissions :
+	@touch www_permissions_start
+	python $(WORK_DIR)/sync_table_www.py permissions
+	@touch www_permissions
+
+www_permissions_roles :
+	@touch www_permissions_roles_start
+	python $(WORK_DIR)/sync_table_www.py permissions_roles
+	@touch www_permissions_roles
+
+www_qr_codes :
+	@touch www_qr_codes_start
+	python $(WORK_DIR)/sync_table_www.py qr_codes
+	@touch www_qr_codes
+
+www_sale_students :
+	@touch www_sale_students_start
+	python $(WORK_DIR)/sync_table_www.py sale_students
+	@touch www_sale_students
+
+www_schema_migrations :
+	@touch www_schema_migrations_start
+	python $(WORK_DIR)/sync_table_www.py schema_migrations
+	@touch www_schema_migrations
+
+www_school_applications :
+	@touch www_school_applications_start
+	python $(WORK_DIR)/sync_table_www.py school_applications
+	@touch www_school_applications
+
+www_seos :
+	@touch www_seos_start
+	python $(WORK_DIR)/sync_table_www.py seos
+	@touch www_seos
+
+www_tasks :
+	@touch www_tasks_start
+	python $(WORK_DIR)/sync_table_www.py tasks
+	@touch www_tasks
+
+www_tasks_users :
+	@touch www_tasks_users_start
+	python $(WORK_DIR)/sync_table_www.py tasks_users
+	@touch www_tasks_users
+
+www_users_students_confirmations :
+	@touch www_users_students_confirmations_start
+	python $(WORK_DIR)/sync_table_www.py users_students_confirmations
+	@touch www_users_students_confirmations
+
+www : www_course_infos www_courses_courses www_courses_instructors www_courses_lms_courses www_courses_micro_specialties www_courses_navigations  www_enrollments www_enrollment_terms www_evaluations www_evaluations_users www_instructors www_learning_records www_micro_specialties www_micro_specialties_users www_navigations www_areas www_assets www_categories www_certificates www_certificates_users www_collections www_common_logs www_discussions www_faqs www_feedbacks www_institutions www_news www_pages www_profiles www_related_courses_courses www_roles www_simple_captcha_data www_specialties www_syllabuses www_syllabuses www_taggings www_taggings www_tags www_versions www_zones www_sign_in_stage_scores www_score_logs www_scores www_line_items www_students www_students_users_confirmations www_schools www_simple_captcha_data www_courses_lms_courses_schools www_bugs www_activities www_activities_users www_activity_orders www_addresses www_administrators www_advertisements www_articles www_banners www_books www_books_courses www_certificate_backgrounds www_certificate_institutions www_certificate_institutions_certificates www_certificate_institutions_micro_certificates www_certificate_instructors www_certificate_instructors_certificates www_certificate_instructors_micro_certificates www_comments www_course_categories www_credit_students www_deliveries www_gifts www_micro_certificates www_micro_certificates_users www_permissions www_qr_codes www_sale_students www_school_applications www_seos www_tasks www_tasks_users www_users_students_confirmations www_micro_majors www_micro_majors_customer_consult_infos www_micro_majors_enrollments www_micro_majors_periods www_micro_majors_periods_stages www_micro_majors_periods_stages_classes www_micro_majors_sale_students www_micro_majors_stages www_micro_majors_stages_courses www_micro_majors_students
+	@touch www
+
+dw_lcms_chapter_table : lcms_courses lcms_units lcms_chapters lcms_quizzes lcms_assignments
+	@touch dw_lcms_chapter_table_start
+	python $(WORK_DIR)/dw_lcms_chapter_table.py
+	@touch dw_lcms_chapter_table
+
+dw_lcms_score_table : lcms_submissions lcms_quiz_submissions
+	@touch dw_lcms_score_table_start
+	python $(WORK_DIR)/dw_lcms_score_table.py
+	@touch dw_lcms_score_table
+
+dw_lcms_avg_score_table : dw_lcms_score_table
+	@touch dw_lcms_avg_score_table_start
+	python $(WORK_DIR)/dw_lcms_avg_score_table.py
+	@touch dw_lcms_avg_score_table
+
+dw_lcms_score_top : dw_lcms_score_table dw_lcms_chapter_table
+	@touch dw_lcms_score_top_start
+	python $(WORK_DIR)/dw_lcms_score_top.py
+	@touch dw_lcms_score_top
+
+dw_lcms_courses_table : dw_lcms_chapter_table
+	@touch dw_lcms_courses_table_start
+	python $(WORK_DIR)/dw_lcms_courses_table.py
+	@touch dw_lcms_courses_table
+
+dw_video_log : api_video_logs www_courses_lms_courses
+	@touch dw_video_log_start
+	python $(WORK_DIR)/dw_video_log.py
+	@touch dw_video_log
+
+dashboard2_course_process : dw_video_log dw_lcms_score_top
+	@touch dashboard2_course_process_start
+	python $(WORK_DIR)/dashboard2_course_process.py
+	@touch dashboard2_course_process
+
+dashboard2_summary_trend_day : api_video_logs www_courses_lms_courses_schools dashboard2_course_process
+	@touch dashboard2_summary_trend_day_start
+	python $(WORK_DIR)/dashboard2_summary_trend_day.py $(day)
+	@touch dashboard2_summary_trend_day
+
+dashboard2_course_summary_day : api_video_logs www_courses_lms_courses_schools dw_lcms_courses_table dashboard2_course_process
+	@touch dashboard2_course_summary_day_start
+	python $(WORK_DIR)/dashboard2_course_summary_day.py $(day)
+	@touch dashboard2_course_summary_day
+
+dashboard2_summary_top : dashboard2_course_summary_day
+	@touch dashboard2_summary_top_start
+	python $(WORK_DIR)/dashboard2_summary_top.py $(day)
+	@touch dashboard2_summary_top
+
+dashboard2_course_time_analyse_day : api_video_logs lcms_submissions www_courses_lms_courses_schools www_courses
+	@touch dashboard2_course_time_analyse_day_start
+	python $(WORK_DIR)/dashboard2_course_time_analyse_day.py $(day)
+	@touch dashboard2_course_time_analyse_day
+
+dashboard2_course_viewlist : dw_lcms_chapter_table lcms_videos api_video_logs www_students
+	@touch dashboard2_course_viewlist_start
+	python $(WORK_DIR)/dashboard2_course_viewlist.py
+	@touch dashboard2_course_viewlist
+
+update_start_conclude_enrollments_courses_lms_courses : www_enrollments www_courses_lms_courses lms_courses lcms_courses
+	@touch update_start_conclude_enrollments_courses_lms_courses_start
+	python $(WORK_DIR)/update_start_conclude_enrollments_courses_lms_courses.py
+	@touch update_start_conclude_enrollments_courses_lms_courses
+
+lcms_oc_subscribe_logs :
+	@touch lcms_oc_subscribe_logs_start
+	python $(WORK_DIR)/sync_table_lcms.py oc_subscribe_logs
+	@touch lcms_oc_subscribe_logs
+
+www_micro_majors_students:
+	@touch www_micro_majors_students_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_students
+	@touch www_micro_majors_students
+
+www_micro_majors_stages_courses:
+	@touch www_micro_majors_stages_courses_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_stages_courses
+	@touch www_micro_majors_stages_courses
+
+www_micro_majors_stages:
+	@touch www_micro_majors_stages_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_stages
+	@touch www_micro_majors_stages
+
+www_micro_majors_sale_students:
+	@touch www_micro_majors_sale_students_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_sale_students
+	@touch www_micro_majors_sale_students
+
+www_micro_majors_periods_stages_classes:
+	@touch www_micro_majors_periods_stages_classes_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_periods_stages_classes
+	@touch www_micro_majors_periods_stages_classes
+
+www_micro_majors_periods_stages:
+	@touch www_micro_majors_periods_stages_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_periods_stages
+	@touch www_micro_majors_periods_stages
+
+www_micro_majors_periods:
+	@touch www_micro_majors_periods_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_periods
+	@touch www_micro_majors_periods
+
+www_micro_majors_enrollments:
+	@touch www_micro_majors_enrollments_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_enrollments
+	@touch www_micro_majors_enrollments
+
+www_micro_majors_customer_consult_infos:
+	@touch www_micro_majors_customer_consult_infos_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors_customer_consult_infos
+	@touch www_micro_majors_customer_consult_infos
+
+www_micro_majors:
+	@touch www_micro_majors_start
+	python $(WORK_DIR)/sync_table_www.py micro_majors
+	@touch www_micro_majors
+
+res_score_report : dw_lcms_chapter_table dashboard2_course_process lcms_submissions
+	@touch res_score_report_start
+	python $(WORK_DIR)/res_score_report.py
+	@touch res_score_report
+
+lcms_chapter_drag_update : api_video_logs lcms_videos lcms_courses
+	@touch lcms_chapter_drag_update_start
+	python $(WORK_DIR)/lcms_chapter_drag_update.py
+	@touch lcms_chapter_drag_update
+
+lcms_chapter_back_update : api_video_logs lcms_videos lcms_courses
+	@touch lcms_chapter_back_update_start
+	python $(WORK_DIR)/lcms_chapter_back_update.py
+	@touch lcms_chapter_back_update
+
+lcms_chapter_pause_update : api_video_logs lcms_videos lcms_courses
+	@touch lcms_chapter_pause_update_start
+	python $(WORK_DIR)/lcms_chapter_pause_update.py
+	@touch lcms_chapter_pause_update
+
+lcms_chapter_histogram_update : api_video_logs lcms_videos lcms_courses
+	@touch lcms_chapter_histogram_update_start
+	python $(WORK_DIR)/lcms_chapter_histogram_update.py
+	@touch lcms_chapter_histogram_update
+
+rpt_operating_two_weeks : dw_lcms_courses_table lcms_categories dw_lcms_chapter_table api_video_logs handled_video_action dw_course_table www_courses www_categories dw_paid_orders_items dw_users_table lms_enrollments lcms_enrollments dw_piwik_visit_log dw_piwik_visit
+	@touch rpt_operating_two_weeks_start
+	python $(WORK_DIR)/rpt_operating_two_weeks.py $(day)
+	@touch rpt_operating_two_weeks
+
+rpt_operating_week : dw_lcms_courses_table lcms_categories dw_lcms_chapter_table api_video_logs handled_video_action dw_course_table www_courses www_categories dw_paid_orders_items dw_users_table lms_enrollments lcms_enrollments dw_piwik_visit_log dw_piwik_visit rpt_operating_two_weeks
+	@touch rpt_operating_week_start
+	python $(WORK_DIR)/rpt_operating_week.py $(day)
+	@touch rpt_operating_week
+
+rpt_schoolsale_kpi_week : www_students www_micro_majors_students www_schools www_courses_lms_courses_schools api_video_logs dashboard2_course_process www_sale_students handled_video_action
+	@touch rpt_schoolsale_kpi_week_start
+	python $(WORK_DIR)/rpt_schoolsale_kpi_week.py $(day)
+	@touch rpt_schoolsale_kpi_week
+
+api_log_video_slowload :
+	@touch api_log_video_slowload_start
+	python $(WORK_DIR)/sync_table_api_log_video_slowload.py log_video_slowload api_log_video_slowload
+	@touch api_log_video_slowload
+	

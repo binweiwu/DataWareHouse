@@ -1,0 +1,18 @@
+1、db.ini 邮箱账号密码设置；；mysql库、端口、账号、密码设置；；其他设置
+
+2、Makefile中定义脚本依赖。各种能直接在Linux下运行的都ok。【注意放置脚本的位置】
+
+3、Makefile里涉及到额脚本文件的书写。【注意里面涉及到的路径，还有涉及到的包确定是可以调用到的】
+
+4、配置start_job_with_rule.py 到crontab里。【注意Python的包click要自己下载pip install click】
+
+5、优化：任何位置输入：run  可直接重跑任务。。场景：任务没有跑成功（touch send_email）,查看任务执行情况。
+--alias
+~/.bashrc
+# some more aliases myself
+ 86 alias run='python /home/ubuntu/data_sync/start_job_with_rule.py $(date -d yesterday +\%Y\%m\%d) $(date     -d yesterday +\%Y\%m\%d)'
+
+
+6、优化：区间执行的时候，不要每天都发一个send_email..
+
+7、

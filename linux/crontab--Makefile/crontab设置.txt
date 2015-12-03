@@ -1,0 +1,2 @@
+##定时每天11:30执行 
+30 11 * * * python /home/ubuntu/data_sync/start_job_with_rule.py $(date -d yesterday +\%Y\%m\%d) $(dat    e -d yesterday +\%Y\%m\%d)
