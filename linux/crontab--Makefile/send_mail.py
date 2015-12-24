@@ -6,8 +6,7 @@ import ConfigParser
 cf = ConfigParser.ConfigParser()
 cf.read('/data/db.ini')
 sender = cf.get('mail', 'sender')
-receiver = ['dwkong@kaikeba.com', 'hywang@kaikeba.com',
-            'ghzhu@kaikeba.com', 'sqren@kaikeba.com']
+receiver = ['',]
 subject = '[通知]今日作业执行完成'
 username = cf.get('mail', 'user')
 password = cf.get('mail', 'password')

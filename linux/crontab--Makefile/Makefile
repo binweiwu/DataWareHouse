@@ -14,17 +14,17 @@ rpt_order_principal_day :
 
 create_table :     
 	@touch create_table_start
-	mysql -uroot -p123 test < /home/ubuntu/data_sync/create.sql
+	mysql -uroot -p test < /home/ubuntu/data_sync/create.sql
 	@touch create_table
 
 uc_apply : create_table
 	@touch uc_apply_start
-	mysql -uroot -p123 test </home/ubuntu/data_sync/uc_apply.sql
+	mysql -uroot -p test </home/ubuntu/data_sync/uc_apply.sql
 	@touch uc_apply
 
 uc_area_group : create_table    
 	@touch uc_area_group_start
-	mysql -uroot -p123 test </home/ubuntu/data_sync/uc_area_group.sql
+	mysql -uroot -p test </home/ubuntu/data_sync/uc_area_group.sql
 	@touch uc_area_group
 
 temp : uc_area_group    
